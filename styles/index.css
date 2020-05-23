@@ -1,0 +1,8 @@
+@import "./tailwind.css";
+@import "./inter.css";
+
+html,
+body,
+#__next {
+  @apply h-full;
+}

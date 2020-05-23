@@ -1,0 +1,22 @@
+name: Update name and dependencies
+
+on:
+  create:
+    branches: [master]
+
+jobs:
+  update-name-and-dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: echo ::set-env name=REPOSITORY_NAME::$(echo "$GITHUB_REPOSITORY" | awk -F / '{print $2}')
+        shell: bash
+      - uses: actions/setup-node@v1
+      - run: git config user.name $GITHUB_ACTOR
+      - run: npm i -g npm-check-updates json
+      - run: ncu -u
+      - run: json -I -f package.json -e "this.name='$REPOSITORY_NAME'"
+      - run: git add package.json
+      - run: git commit -m "Update name and dependencies"
+      - run: git remote add github "https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git"
+      - run: git push
