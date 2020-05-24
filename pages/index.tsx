@@ -1,11 +1,12 @@
+import { Form } from "components/Form"
 import Head from "next/head"
 
 const Index = () => (
   <>
     <Head>
-      <title>Title</title>
+      <title>Create your pool</title>
     </Head>
-    <div>Index</div>
+    <Form />
   </>
 )
 

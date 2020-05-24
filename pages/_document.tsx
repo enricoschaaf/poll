@@ -5,7 +5,7 @@ class MyDocument extends Document {
     return (
       <Html lang="en">
         <Head>
-          <meta name="description" content="Meta description" />
+          <meta name="description" content="Pooling app" />
           <meta name="theme-color" content="#f4f5f7" />
           <link rel="icon" type="image/svg+xml" href="favicon.svg" />
           <link
