@@ -1,70 +1,74 @@
 import { nanoid } from "nanoid"
 import { useRouter } from "next/router"
 import { useState } from "react"
-
+import { useForm } from "react-hook-form"
 const initalState = [nanoid(), nanoid(), nanoid()]
 
 export const Form = () => {
   const router = useRouter()
+  const { register, handleSubmit, reset } = useForm()
+  const onSubmit = async (data, e) => {
+    const options = Object.entries(data).filter(
+      ([id, value]: [string, string]) =>
+        id.startsWith("option-") && value !== ""
+    )
+    if (options.length > 1) {
+      setStatus("loading")
+      const res = await fetch("/api/create", {
+        headers: { "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({
+          title: data.title,
+          options: options.map(([, value]) => value),
+          allowMultipleOptions: data.allowMultipleOptions
+        })
+      })
+      const {
+        data: { slug }
+      } = await res.json()
+      router.push(`/${slug}`)
+      reset()
+      setStatus("success")
+    } else if (options.length === 0) {
+      ;[...e.target].find(({ name }) => name.startsWith("option-")).select()
+    } else {
+      ;[...e.target]
+        .find(({ name, value }) => name.startsWith("option-") && value === "")
+        .select()
+    }
+  }
   const [status, setStatus] = useState("success")
   const [options, setOptions] = useState(initalState)
 
-  async function handleSubmit(e) {
-    e.persist()
-    e.preventDefault()
-    setStatus("loading")
-    const data = {
-      title: [...e.target].find(({ id }) => id === "title").value,
-      options: [...e.target]
-        .filter(({ id, value }) => id.includes("option-") && value !== "")
-        .map(({ value }) => value),
-      allowMultipleOptions: [...e.target].find(
-        ({ id }) => id === "allowMultipleOptions"
-      ).checked
-    }
-    const res = await fetch("/api/create", {
-      headers: { "Content-Type": "application/json" },
-      method: "POST",
-      body: JSON.stringify(data)
-    })
-    const {
-      data: { slug }
-    } = await res.json()
-    e.target.reset()
-    router.push(`/${slug}`)
-    setStatus("success")
-  }
-
   return (
-    <div className="max-w-3xl mx-auto p-4 sm:p-6 lg:p-8 flex justify-center items-center h-full">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white overflow-hidden shadow rounded-lg w-full"
-      >
-        <div className="px-4 py-5 sm:p-6 grid gap-4 sm:gap-6 lg:gap-8">
-          <Title />
-          {options.map((id, index) => (
-            <Option
-              id={id}
-              key={id}
-              index={index}
-              options={options}
-              setOptions={setOptions}
-            />
-          ))}
-          <Checkbox />
-        </div>
-        <div className="bg-gray-50 px-4 py-4 sm:px-6 space-x-4 sm:space-x-6 lg:space-x-8 flex justify-end">
-          <SubmitButton status={status} />
-          <ResetButton setOptions={setOptions} />
-        </div>
-      </form>
-    </div>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="bg-white overflow-hidden shadow rounded-lg w-full"
+    >
+      <div className="px-4 py-5 sm:p-6 grid gap-4 sm:gap-6 lg:gap-8">
+        <Title register={register} />
+        {options.map((id, index) => (
+          <Option
+            register={register}
+            id={id}
+            key={id}
+            index={index}
+            options={options}
+            setOptions={setOptions}
+          />
+        ))}
+        <Checkbox register={register} />
+      </div>
+      <div className="bg-gray-50 px-4 py-4 sm:px-6 space-x-4 sm:space-x-6 lg:space-x-8 flex justify-end">
+        <SubmitButton status={status} />
+        <ResetButton setOptions={setOptions} />
+      </div>
+    </form>
   )
 }
 
-const Option = ({ id, index, options, setOptions }) => (
-  <div className="overflow-hidden">
+const Option = ({ id, index, options, setOptions, register }) => (
+  <>
     <label htmlFor={`option-${id}`} className="sr-only">
       Option
     </label>
@@ -74,6 +78,8 @@ const Option = ({ id, index, options, setOptions }) => (
         className="form-input block w-full sm:text-sm sm:leading-5"
         placeholder={`Option ${index + 1}`}
         autoComplete="off"
+        ref={register}
+        name={`option-${id}`}
         onInput={() => {
           if (index === options.length - 1) {
             setOptions(previousOptions => [...previousOptions, nanoid()])
@@ -81,10 +87,10 @@ const Option = ({ id, index, options, setOptions }) => (
         }}
       />
     </div>
-  </div>
+  </>
 )
 
-const Title = () => (
+const Title = ({ register }) => (
   <>
     <label htmlFor="title" className="sr-only">
       Title
@@ -92,10 +98,11 @@ const Title = () => (
     <div className="relative rounded-md shadow-sm">
       <input
         id="title"
+        name="title"
+        ref={register({ required: true })}
         className="form-input block w-full sm:text-sm sm:leading-5"
         placeholder="Title"
         autoComplete="off"
-        required
       />
     </div>
   </>
@@ -130,12 +137,14 @@ const ResetButton = ({ setOptions }) => (
   </span>
 )
 
-const Checkbox = () => (
+const Checkbox = ({ register }) => (
   <div className="relative flex items-start">
     <div className="absolute flex items-center h-5">
       <input
         id="allowMultipleOptions"
+        name="allowMultipleOptions"
         type="checkbox"
+        ref={register}
         className="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out"
       />
     </div>

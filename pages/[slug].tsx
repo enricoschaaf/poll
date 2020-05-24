@@ -1,21 +1,31 @@
 import { useFetch } from "hooks/useFetch"
 import Head from "next/head"
 import { useRouter } from "next/router"
-
-async function handleSubmit(e) {
-  e.persist()
-  e.preventDefault()
-  const data = {}
-  await fetch("/api/vote", {
-    headers: { "Content-Type": "application/json" },
-    method: "POST",
-    body: JSON.stringify(data)
-  })
-  e.target.reset()
-}
+import { useForm } from "react-hook-form"
 
 const Slug = () => {
   const router = useRouter()
+  const { register, handleSubmit, reset } = useForm()
+  const onSubmit = async (data, e) => {
+    if (data?.option) {
+      await fetch("/api/vote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      })
+      return reset()
+    }
+    if (Object.entries(data).find(([, value]) => value == true)) {
+      await fetch("/api/vote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      })
+      return reset()
+    }
+
+    ;[...e.target].find(({ type }) => type === "checkbox").select()
+  }
   const { data } = useFetch(
     router.query.slug && `/api/get/${router.query.slug}`
   )
@@ -25,26 +35,35 @@ const Slug = () => {
         <Head>
           <title>{data?.title ?? "Poll"}</title>
         </Head>
-        <div className="max-w-3xl mx-auto p-4 sm:p-6 lg:p-8 flex justify-center items-center h-full">
-          <form
-            onSubmit={handleSubmit}
-            className="bg-white overflow-hidden shadow rounded-lg w-full"
-          >
-            <div className="px-4 py-5 sm:p-6 grid gap-4 sm:gap-6 lg:gap-8">
-              <h1 className="text-gray-700">{data.title}</h1>
-              {data.allowMultipleOptions
-                ? data.options.map(({ id, name }) => (
-                    <Checkbox key={id} name={name} />
-                  ))
-                : data.options.map(({ id, name }) => (
-                    <Radio key={id} name={name} />
-                  ))}
-            </div>
-            <div className="bg-gray-50 px-4 py-4 sm:px-6 space-x-4 sm:space-x-6 lg:space-x-8 flex justify-end">
-              <VoteButton />
-              <ShowResultButton />
-            </div>
-          </form>
+        <div className="flex-grow p-4 sm:p-6 lg:p-8 flex">
+          <div className="max-w-3xl mx-auto flex-grow flex justify-center items-center">
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="bg-white overflow-hidden shadow rounded-lg w-full"
+            >
+              <div className="px-4 py-5 sm:p-6 grid gap-4 sm:gap-6 lg:gap-8">
+                <h1 className="text-indigo-600 font-semibold text-lg">
+                  {data.title}
+                </h1>
+                {data.allowMultipleOptions
+                  ? data.options.map(({ id, name }) => (
+                      <Checkbox
+                        register={register}
+                        key={id}
+                        id={id}
+                        name={name}
+                      />
+                    ))
+                  : data.options.map(({ id, name }) => (
+                      <Radio register={register} key={id} id={id} name={name} />
+                    ))}
+              </div>
+              <div className="bg-gray-50 px-4 py-4 sm:px-6 space-x-4 sm:space-x-6 lg:space-x-8 flex justify-end">
+                <VoteButton />
+                <ShowResultButton />
+              </div>
+            </form>
+          </div>
         </div>
       </>
     )
@@ -52,35 +71,37 @@ const Slug = () => {
   return null
 }
 
-const Checkbox = ({ name }) => (
-  <div className="mt-4">
-    <div className="relative flex items-start">
-      <div className="absolute flex items-center h-5">
-        <input
-          id={name}
-          type="checkbox"
-          className="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out"
-        />
-      </div>
-      <label
-        htmlFor={name}
-        className="pl-7 text-sm leading-5 font-medium text-gray-500"
-      >
-        {name}
-      </label>
+const Checkbox = ({ id, name, register }) => (
+  <div className="relative flex items-start">
+    <div className="absolute flex items-center h-5">
+      <input
+        id={id}
+        name={id}
+        type="checkbox"
+        className="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out"
+        ref={register}
+      />
     </div>
+    <label
+      htmlFor={id}
+      className="pl-7 text-sm leading-5 font-medium text-gray-500"
+    >
+      {name}
+    </label>
   </div>
 )
 
-const Radio = ({ name }) => (
-  <div className="mt-4 flex items-center">
+const Radio = ({ id, name, register }) => (
+  <div className="flex items-center">
     <input
-      id={name}
+      id={id}
       name="option"
       type="radio"
+      value={id}
       className="form-radio h-4 w-4 text-indigo-600 transition duration-150 ease-in-out"
+      ref={register({ required: true })}
     />
-    <label htmlFor={name} className="ml-3">
+    <label htmlFor={id} className="ml-3">
       <span className="block text-sm leading-5 font-medium text-gray-500">
         {name}
       </span>

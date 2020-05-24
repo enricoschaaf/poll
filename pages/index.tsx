@@ -6,7 +6,11 @@ const Index = () => (
     <Head>
       <title>Create your pool</title>
     </Head>
-    <Form />
+    <div className="flex-grow p-4 sm:p-6 lg:p-8 flex">
+      <div className="max-w-3xl mx-auto flex-grow flex justify-center items-center">
+        <Form />
+      </div>
+    </div>
   </>
 )
 

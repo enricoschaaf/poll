@@ -11,7 +11,8 @@
     "nanoid": "^3.1.9",
     "next": "^9.4.2",
     "react": "16.13.1",
-    "react-dom": "16.13.1"
+    "react-dom": "16.13.1",
+    "react-hook-form": "^5.7.2"
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^9.4.2",
