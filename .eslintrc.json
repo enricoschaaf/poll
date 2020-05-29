@@ -42,7 +42,8 @@
     "jsx-a11y/anchor-is-valid": "off",
     "import/no-anonymous-default-export": "error",
     "@typescript-eslint/explicit-module-boundary-types": "off",
-    "react/prop-types": "off"
+    "react/prop-types": "off",
+    "@typescript-eslint/ban-ts-comment": "warn"
   },
   "settings": {
     "react": {
