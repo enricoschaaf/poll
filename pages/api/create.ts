@@ -7,7 +7,6 @@ const prisma = new PrismaClient()
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
     const { title, options, allowMultipleOptions } = req.body
-
     const { id, slug } = await prisma.poll.create({
       select: { id: true, slug: true },
       data: {

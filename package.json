@@ -8,13 +8,16 @@
   },
   "dependencies": {
     "@prisma/client": "^2.0.0-beta.7",
+    "framer-motion": "^2.0.0-beta.72",
     "nanoid": "^3.1.9",
     "next": "^9.4.4",
     "preact": "^10.4.4",
     "preact-render-to-string": "^5.1.9",
     "react": "github:preact-compat/react#1.0.0",
     "react-dom": "github:preact-compat/react-dom#1.0.0",
-    "react-hook-form": "^5.7.2"
+    "react-hook-form": "^5.7.2",
+    "rm": "^0.1.8",
+    "swr": "^0.2.2"
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^9.4.4",

@@ -13,12 +13,27 @@ model Poll {
   title                String
   options              Option[]
   allowMultipleOptions Boolean
+  Blacklist            Ip[]
+  @@index([slug])
+  @@map("Polls")
 }
 
 model Option {
+  id        String   @default(cuid()) @id
+  key       Int      @default(0)
+  name      String
+  createdAt DateTime @default(now())
+  votes     Int      @default(0)
+  Poll      Poll     @relation(fields: [pollId], references: [id])
+  pollId    String
+  @@map("Options")
+}
+
+model Ip {
   id     String @default(cuid()) @id
-  name   String
-  votes  Int    @default(0)
+  ip     String
   Poll   Poll   @relation(fields: [pollId], references: [id])
   pollId String
+  @@index([ip])
+  @@map("Ips")
 }

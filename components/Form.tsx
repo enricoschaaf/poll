@@ -1,3 +1,4 @@
+import { AnimateSharedLayout, motion } from "framer-motion"
 import { nanoid } from "nanoid"
 import { useRouter } from "next/router"
 import { useState } from "react"
@@ -42,29 +43,32 @@ export const Form = () => {
   const [options, setOptions] = useState(initalState)
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="bg-white overflow-hidden shadow rounded-lg w-full"
-    >
-      <div className="px-4 py-5 sm:p-6 grid gap-4 sm:gap-6 lg:gap-8">
-        <Title register={register} />
-        {options.map((id, index) => (
-          <Option
-            register={register}
-            id={id}
-            key={id}
-            index={index}
-            options={options}
-            setOptions={setOptions}
-          />
-        ))}
-        <Checkbox register={register} />
-      </div>
-      <div className="bg-gray-50 px-4 py-4 sm:px-6 space-x-4 flex justify-end">
-        <SubmitButton status={status} />
-        <ResetButton setOptions={setOptions} />
-      </div>
-    </form>
+    <AnimateSharedLayout>
+      <motion.form
+        animate
+        onSubmit={handleSubmit(onSubmit)}
+        className="bg-white overflow-hidden shadow rounded-lg w-full"
+      >
+        <div className="px-4 py-5 sm:p-6 grid gap-4 sm:gap-6 lg:gap-8">
+          <Title register={register} />
+          {options.map((id, index) => (
+            <Option
+              register={register}
+              id={id}
+              key={id}
+              index={index}
+              options={options}
+              setOptions={setOptions}
+            />
+          ))}
+          <Checkbox register={register} />
+        </div>
+        <div className="bg-gray-50 px-4 py-4 sm:px-6 space-x-4 flex justify-end">
+          <SubmitButton status={status} />
+          <ResetButton setOptions={setOptions} />
+        </div>
+      </motion.form>
+    </AnimateSharedLayout>
   )
 }
 
@@ -97,7 +101,7 @@ const Title = ({ register }) => (
       Title
     </label>
     <div className="relative rounded-md shadow-sm">
-      <input
+      <motion.input
         id="title"
         name="title"
         ref={register({ required: true })}
@@ -141,7 +145,7 @@ const ResetButton = ({ setOptions }) => (
 const Checkbox = ({ register }) => (
   <div className="relative flex items-start">
     <div className="absolute flex items-center h-5">
-      <input
+      <motion.input
         id="allowMultipleOptions"
         name="allowMultipleOptions"
         type="checkbox"
