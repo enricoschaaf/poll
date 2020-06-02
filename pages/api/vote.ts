@@ -6,31 +6,41 @@ const prisma = new PrismaClient()
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
     const ip: any = req.headers["x-real-ip"]
-    const {
-      votes,
-      Poll: { Blacklist, id: pollId }
-    } = await prisma.option.findOne({
-      select: {
-        votes: true,
-        Poll: {
-          select: {
-            Blacklist: {
-              where: { ip: { equals: ip } }
-            },
-            id: true
+    if (req.body.option) {
+      const {
+        votes,
+        Poll: { Blacklist: blacklist, id: pollId }
+      } = await prisma.option.findOne({
+        select: {
+          votes: true,
+          Poll: {
+            select: {
+              Blacklist: {
+                where: { ip: { equals: ip } }
+              },
+              id: true
+            }
           }
-        }
-      },
-      where: { id: req.body.option }
-    })
-    console.log(Blacklist)
-    await prisma.option.update({
-      data: { votes: votes + 1 },
-      where: { id: req.body.option }
-    })
-    await prisma.ip.create({
-      data: { Poll: { connect: { id: pollId } }, ip }
-    })
+        },
+        where: { id: req.body.option }
+      })
+      if (blacklist.length === 0) {
+        await Promise.all([
+          prisma.option.update({
+            data: { votes: votes + 1 },
+            where: { id: req.body.option }
+          }),
+          prisma.ip.create({
+            data: {
+              Poll: { connect: { id: pollId } },
+              ip
+            }
+          })
+        ])
+        res.end()
+      }
+      res.status(403)
+    }
     const options = await Promise.all(
       Object.entries(req.body)
         .filter(([, value]) => value === true)
@@ -43,7 +53,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     )
     await Promise.all(
       options.map(({ id, votes }) =>
-        prisma.option.update({ data: { votes: votes + 1 }, where: { id } })
+        prisma.option.update({
+          data: { votes: votes + 1 },
+          where: { id }
+        })
       )
     )
     res.end()

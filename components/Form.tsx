@@ -4,10 +4,10 @@ import { useRouter } from "next/router"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 
-const initalState = [nanoid(), nanoid(), nanoid()]
+const initalState = ["1", "2", "3"]
 
 export const Form = () => {
-  const router = useRouter()
+  const { push } = useRouter()
   const { register, handleSubmit, reset } = useForm()
   const [status, setStatus] = useState("success")
   const onSubmit = async (data, e) => {
@@ -16,20 +16,21 @@ export const Form = () => {
         id.startsWith("option-") && value !== ""
     )
     if (options.length > 1) {
+      const body = {
+        title: data.title,
+        options: options.map(([, value]) => value),
+        allowMultipleOptions: data.allowMultipleOptions
+      }
       setStatus("loading")
       const res = await fetch("/api/create", {
         headers: { "Content-Type": "application/json" },
         method: "POST",
-        body: JSON.stringify({
-          title: data.title,
-          options: options.map(([, value]) => value),
-          allowMultipleOptions: data.allowMultipleOptions
-        })
+        body: JSON.stringify(body)
       })
       const {
         data: { slug }
       } = await res.json()
-      router.push("/[slug]", `/${slug}`)
+      push("/[slug]", `/${slug}`)
       reset()
       setStatus("success")
     } else if (options.length === 0) {

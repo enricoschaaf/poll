@@ -1,9 +1,9 @@
 import { PrismaClient } from "@prisma/client"
+import { Layout } from "components/Layout"
 import { Poll } from "components/Poll"
 import dynamic from "next/dynamic"
 
 const Error = dynamic(() => import("../components/Error"))
-
 const prisma = new PrismaClient()
 
 export async function getStaticProps({ params: { slug } }) {
@@ -35,7 +35,12 @@ export async function getStaticPaths() {
 
 const Slug = ({ data }) => {
   if (!data) return <Error statusCode={404} />
-  if (data) return <Poll data={data} />
+  if (data)
+    return (
+      <Layout>
+        <Poll data={data} />
+      </Layout>
+    )
 }
 
 export default Slug

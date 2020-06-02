@@ -1,4 +1,5 @@
 import { Form } from "components/Form"
+import { Layout } from "components/Layout"
 import Head from "next/head"
 import { useRouter } from "next/router"
 import { useEffect } from "react"
@@ -13,7 +14,9 @@ const Index = () => {
       <Head>
         <title>Create your poll</title>
       </Head>
-      <Form />
+      <Layout>
+        <Form />
+      </Layout>
     </>
   )
 }

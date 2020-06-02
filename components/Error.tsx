@@ -9,7 +9,7 @@ const Error = ({ statusCode }) => (
       <span className="text-gray-600 text-center">
         <h1 className="text-4xl font-black">{statusCode}</h1>
         <p className="text-lg font-medium">
-          {statusCode == "404"
+          {statusCode == 404
             ? "Page not found"
             : "An unexpected error has occurred"}
         </p>

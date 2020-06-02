@@ -97,7 +97,7 @@ export const Poll = ({ data }) => {
                 {active === "vote" ? (
                   <Vote data={data} register={register} />
                 ) : (
-                  <Result />
+                  <Result data={data} />
                 )}
               </AnimatePresence>
             </div>
