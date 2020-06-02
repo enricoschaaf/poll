@@ -7,8 +7,9 @@ export const Result = ({ data: initalData }) => {
   } = useRouter()
   const { data } = useSWR(`/api/result/${slug}`, {
     fetcher: url => fetch(url).then(res => res.json()),
-    refreshInterval: 1
+    refreshInterval: 0.5
   })
+  console.log(initalData)
   return (
     <>
       {data?.options.map(({ id, name, votes }) => (
@@ -20,13 +21,13 @@ export const Result = ({ data: initalData }) => {
           <span>{votes}</span>
         </div>
       )) ??
-        initalData.options.map(name, index => (
+        initalData.options.map(({ id, name, votes }) => (
           <div
             className="flex justify-between text-sm leading-5 font-medium text-gray-500"
-            key={index}
+            key={id}
           >
             <span>{name}</span>
-            <span>0</span>
+            <span>{votes}</span>
           </div>
         ))}
     </>

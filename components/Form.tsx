@@ -4,7 +4,7 @@ import { useRouter } from "next/router"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 
-const initalState = ["1", "2", "3"]
+const initalState = [nanoid(), nanoid(), nanoid()]
 
 export const Form = () => {
   const { push } = useRouter()

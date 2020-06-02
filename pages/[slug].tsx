@@ -11,7 +11,7 @@ export async function getStaticProps({ params: { slug } }) {
     select: {
       title: true,
       options: {
-        select: { id: true, name: true },
+        select: { id: true, name: true, votes: true },
         orderBy: { createdAt: "asc" }
       },
       allowMultipleOptions: true
